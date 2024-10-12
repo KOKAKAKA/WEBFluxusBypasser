@@ -1,3 +1,5 @@
+task.spawn(function()
+coroutine.wrap(function()
 local request = request or http_request or Krnl.request or syn.request or Fluxus.request
 
 local function fetchScript(nga)
@@ -44,9 +46,9 @@ local visualize_Enabled = false
 local parry_mode = "Nothing"
 local target_Ball_Distance = 0
 local auto_pary_enabled=false
-local pry_cur=0.6
-local sense=0.9
-local mul=2.65
+local pry_cur=0.558
+local sense=1
+local mul=2.63
 local Helper = fetchScript("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua")
 local RobloxReplicatedStorage = cloneref(game:GetService('RobloxReplicatedStorage'))
 local RbxAnalyticsService = cloneref(game:GetService('RbxAnalyticsService'))
@@ -454,6 +456,7 @@ function AutoParry.perform_grab_animation()
 end
 
 function AutoParry.perform_parry()
+coroutine.wrap(function()
 	local ball_properties = AutoParry.ball.properties
 
 	if ball_properties.cooldown and not ball_properties.auto_spam then
@@ -526,6 +529,7 @@ function AutoParry.perform_parry()
 			ball_properties.parries -= 1
 		end
 	end)
+	end)()
 end
 
 function AutoParry.reset()
@@ -1013,13 +1017,16 @@ end)
 
 
 RunService.PreSimulation:Connect(function()
+coroutine.wrap(function()
 	if not AutoParry.ball.properties.auto_spam then
 		return
 	end
-
+task.spawn(function()
 	for v = 1,spam_speed do
 		AutoParry.perform_parry()
 	end
+end)
+end)()
 end)
 
 local custom_win_audio = Instance.new('Sound', sounds_folder)
@@ -1407,9 +1414,9 @@ ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
 
 	ball = nil
 end)
-
+task.spawn(function()
 RunService.PostSimulation:Connect(function()
-
+coroutine.wrap(function()
 	if not auto_parry_enabled then
 		AutoParry.reset()
 
@@ -1436,7 +1443,7 @@ RunService.PostSimulation:Connect(function()
 
 	ball_properties.is_curved = AutoParry.is_curved()
 
-	local baseMoveAmount = 0.495
+	local baseMoveAmount = 0.51
 	local moveAmount = baseMoveAmount * (1 / (AutoParry.entity_properties.distance + 0.01)) * 1000
 
 	local ping_threshold = math.clamp(Player.Entity.properties.ping / 10, 10, 16)
@@ -1459,8 +1466,7 @@ RunService.PostSimulation:Connect(function()
 	end
 
 	ball_properties.spam_range = ping_threshold + math.min(moveAmount + (ball_properties.speed / 2.3), (50 + moveAmount))
-	ball_properties.parry_range = ping_threshold + ball_properties.speed / math.pi
-
+	ball_properties.parry_range = (parry_accuracity + ping_threshold + ball_properties.speed) / mul
 
 
 	if Player.Entity.properties.sword == 'Titan Blade' then
@@ -1490,10 +1496,6 @@ RunService.PostSimulation:Connect(function()
 		return
 	end
 
-
-
-
-
 	if AutoParry.target.current and AutoParry.target.current.Name == LocalPlayer.Name then
 		ball_properties.auto_spam = AutoParry.is_spam({
 			speed = ball_properties.speed,
@@ -1509,13 +1511,7 @@ RunService.PostSimulation:Connect(function()
 			last_position_distance = distance_to_last_position,
 		})
 	end
-
-
-
-	if ball_properties.auto_spam then
-		return
-	end
-
+	
 	if ball_properties.is_curved then
 		return
 	end
@@ -1546,13 +1542,10 @@ RunService.PostSimulation:Connect(function()
 	end
 
 	lastPosition = LocalPlayer.Character.PrimaryPart.Position 
-
-
-
 	ball_properties.last_ball_pos = ball_properties.position
-
+coroutine.wrap(function()
 	AutoParry.perform_parry()
-
+end)()
 	task.spawn(function()
 		repeat
 			RunService.PreSimulation:Wait(0)
@@ -1561,6 +1554,8 @@ RunService.PostSimulation:Connect(function()
 
 		ball_properties.cooldown = false
 	end)
+	end)()
+end)
 end)
 ManualSpam()
 local Window = interface:CreateWindow({
@@ -1738,3 +1733,5 @@ do
 		spam_speed = v
 	end)
 end 
+end)()
+end)
