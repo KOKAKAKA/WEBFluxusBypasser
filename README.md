@@ -1434,7 +1434,7 @@ RunService.PostSimulation:Connect(function()
 
 	ball_properties.is_curved = AutoParry.is_curved()
 
-	local baseMoveAmount = 0.5
+	local baseMoveAmount = 0.49
 	local moveAmount = baseMoveAmount * (1 / (AutoParry.entity_properties.distance + 0.01)) * 1000
 
 	local ping_threshold = math.clamp(Player.Entity.properties.ping / 10, 10, 16)
@@ -1457,7 +1457,7 @@ RunService.PostSimulation:Connect(function()
 	end
 
 	ball_properties.spam_range = ping_threshold + math.min(moveAmount + (ball_properties.speed / 2.3), (50 + moveAmount))
-	ball_properties.parry_range = ping_threshold + ball_properties.speed / math.pi
+	ball_properties.parry_range = ping_threshold + ball_properties.speed / math.pi * (ball_properties.speed/(parry_accuracity*3))
 
 
 
