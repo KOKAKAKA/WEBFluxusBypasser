@@ -44,9 +44,9 @@ local visualize_Enabled = false
 local parry_mode = "Nothing"
 local target_Ball_Distance = 0
 local auto_pary_enabled=false
-local pry_cur=0.55
+local pry_cur=0.6
 local sense=0.9
-local mul=2.55
+local mul=2.65
 local Helper = fetchScript("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua")
 local RobloxReplicatedStorage = cloneref(game:GetService('RobloxReplicatedStorage'))
 local RbxAnalyticsService = cloneref(game:GetService('RbxAnalyticsService'))
@@ -1408,132 +1408,157 @@ ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
 	ball = nil
 end)
 
-
 RunService.PostSimulation:Connect(function()
 
 	if not auto_parry_enabled then
 		AutoParry.reset()
+
 		return
 	end
 
 	local Character = LocalPlayer.Character
-	if not Character or Character.Parent == Dead then
-		AutoParry.reset()
+
+	if not Character then
 		return
 	end
 
-	local ball = AutoParry.ball
-	if not ball.ball_entity then return end
+	if Character.Parent == Dead then
+		AutoParry.reset()
 
-	local ball_properties = ball.properties
-	local entity_distance = AutoParry.entity_properties.distance
+		return
+	end
 
-	-- Pre-calculate values to avoid multiple function calls
-	local ping = Player.Entity.properties.ping
-	local ping_threshold = math.clamp(ping / 10, 10, 16)
-	local distance_factor = 1 / (entity_distance + 0.01)
-	local baseMoveAmount = 0.49
-	local moveAmount = baseMoveAmount * distance_factor * 1000
+	if not AutoParry.ball.ball_entity then
+		return
+	end
 
-	local ball_speed = ball_properties.speed
+	local ball_properties = AutoParry.ball.properties
+
+	ball_properties.is_curved = AutoParry.is_curved()
+
+	local baseMoveAmount = 0.495
+	local moveAmount = baseMoveAmount * (1 / (AutoParry.entity_properties.distance + 0.01)) * 1000
+
+	local ping_threshold = math.clamp(Player.Entity.properties.ping / 10, 10, 16)
+
+	local spam_accuracity = math.min(moveAmount + (ball_properties.speed / 8.4), (50 + moveAmount)) + ping_threshold
 	local parry_accuracity = ball_properties.maximum_speed / 11 + ping_threshold
-	local spam_accuracity = math.min(moveAmount + (ball_speed / 8.4), (50 + moveAmount)) + ping_threshold
+	local ball_distance_accuracity = ball_properties.distance * 1.01 - ping_threshold / 100
 
-	-- Adjust accuracies based on player's properties
 	local player_properties = Player.Entity.properties
+
+
+
 	if player_properties.is_moving then
-		parry_accuracity = parry_accuracity * 0.8
+		parry_accuracity *= 0.8
 	end
 
-	if ping >= 190 then
-		local ping_factor = 1 + ping / 1000
-		parry_accuracity = parry_accuracity * ping_factor
+	if Player.Entity.properties.ping >= 190 then
+		parry_accuracity = parry_accuracity * (1 + Player.Entity.properties.ping / 1000)
+
 	end
 
-	-- Calculate ranges
-	ball_properties.spam_range = ping_threshold + math.min(moveAmount + (ball_speed / 2.3), (50 + moveAmount))
-	ball_properties.parry_range = (parry_accuracity + ping_threshold + ball_speed) / mul
+	ball_properties.spam_range = ping_threshold + math.min(moveAmount + (ball_properties.speed / 2.3), (50 + moveAmount))
+	ball_properties.parry_range = ping_threshold + ball_properties.speed / math.pi
 
-	-- Titan Blade adjustments
-	if player_properties.sword == 'Titan Blade' then
-		ball_properties.parry_range = ball_properties.parry_range + 11
-		ball_properties.spam_range = ball_properties.spam_range + 2
-	end
 
-	-- Calculate distances
-	local last_position = ball_properties.last_position
-	local distance_to_last_position = LocalPlayer:DistanceFromCharacter(last_position)
 
-	-- Spam check logic
+	if Player.Entity.properties.sword == 'Titan Blade' then
+		ball_properties.parry_range += 11
+		ball_properties.spam_range += 2
+	end	
+
+	local distance_to_last_position = LocalPlayer:DistanceFromCharacter(ball_properties.last_position)
+
 	if ball_properties.auto_spam and AutoParry.target.current then
 		ball_properties.auto_spam = AutoParry.is_spam({
-			speed = ball_speed,
+			speed = ball_properties.speed,
 			spam_accuracy = spam_accuracity,
 			parries = ball_properties.parries,
-			ball_speed = ball_speed,
+			ball_speed = ball_properties.speed,
 			range = ball_properties.spam_range / (3.15 - ping_threshold / 10),
 			last_hit = ball_properties.last_hit,
 			ball_distance = ball_properties.distance,
 			maximum_speed = ball_properties.maximum_speed,
-			old_speed = ball.properties.old_speed,
-			entity_distance = entity_distance,
+			old_speed = AutoParry.ball.properties.old_speed,
+			entity_distance = AutoParry.entity_properties.distance,
 			last_position_distance = distance_to_last_position,
 		})
 	end
 
-	if ball_properties.auto_spam then return end
+	if ball_properties.auto_spam then
+		return
+	end
 
-	-- Handle target validation
-	local current_target = AutoParry.target.current
-	if current_target and current_target.Name == LocalPlayer.Name then
+
+
+
+
+	if AutoParry.target.current and AutoParry.target.current.Name == LocalPlayer.Name then
 		ball_properties.auto_spam = AutoParry.is_spam({
-			speed = ball_speed,
+			speed = ball_properties.speed,
 			spam_accuracy = spam_accuracity,
 			parries = ball_properties.parries,
-			ball_speed = ball_speed,
+			ball_speed = ball_properties.speed,
 			range = ball_properties.spam_range,
 			last_hit = ball_properties.last_hit,
 			ball_distance = ball_properties.distance,
 			maximum_speed = ball_properties.maximum_speed,
-			old_speed = ball.properties.old_speed,
-			entity_distance = entity_distance,
+			old_speed = AutoParry.ball.properties.old_speed,
+			entity_distance = AutoParry.entity_properties.distance,
 			last_position_distance = distance_to_last_position,
 		})
 	end
 
-	if ball_properties.auto_spam or ball_properties.is_curved then return end
 
-	-- Parry distance checks
-	local parry_range_threshold = ball_properties.parry_range * (1 + ping / 1000)
-	if ball_properties.distance > parry_accuracity and ball_properties.distance > parry_range_threshold then
+
+	if ball_properties.auto_spam then
 		return
 	end
 
-	-- Ensure target is valid for parry
-	if current_target and current_target ~= LocalPlayer.Character then return end
+	if ball_properties.is_curved then
+		return
+	end
 
-	-- Legit parry mode
+	if ball_properties.distance > ball_properties.parry_range and ball_properties.distance > parry_accuracity and ball_properties.distance > ball_properties.parry_range * (1 + Player.Entity.properties.ping / 1000) and ball_properties.distance > parry_accuracity * (1 + Player.Entity.properties.ping / 1000) then
+		return
+	end
+
+	if AutoParry.target.current and AutoParry.target.current ~= LocalPlayer.Character then
+		return
+	end
+
+	local lastPosition = LocalPlayer.Character.PrimaryPart.Position 
+
+
 	if parry_mode == "Legit" then
-		if ball_properties.distance <= 50 and AutoParry.entity_properties.distance <= 10 then
-			if math.random(1, 2) == 1 then
+		if target_Ball_Distance <= 10 and AutoParry.entity_properties.distance <= 50 then
+			if math.random(1,2) == 1 then
 				AutoParry.perform_parry()
 			end
 		end
+	end
 
+	if parry_mode == "Legit" then
 		if ball_properties.maximum_speed >= 250 then
-			parry_accuracity = parry_accuracity * 1.2
+			parry_accuracity *= 1.2
 		end
 	end
 
-	-- Update ball position and perform parry
+	lastPosition = LocalPlayer.Character.PrimaryPart.Position 
+
+
+
 	ball_properties.last_ball_pos = ball_properties.position
+
 	AutoParry.perform_parry()
 
-	-- Handle cooldown logic asynchronously
 	task.spawn(function()
 		repeat
 			RunService.PreSimulation:Wait(0)
-		until (tick() - ball_properties.last_hit) > 1 - (ping_threshold / 100)
+		until 
+		(tick() - ball_properties.last_hit) > 1 - (ping_threshold / 100)
+
 		ball_properties.cooldown = false
 	end)
 end)
