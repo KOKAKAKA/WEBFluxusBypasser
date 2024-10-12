@@ -661,7 +661,7 @@ end
 local old_from_target = nil :: Model
 
 function AutoParry:is_spam()
-if auto_pary_enabled then return false end
+if not auto_pary_enabled then return false end
 	local target = AutoParry.target.current
 
 	if not target then
