@@ -1560,7 +1560,7 @@ RunService.PostSimulation:Connect(function()
 		ball_properties.cooldown = false
 	end)
 end)
-
+ManualSpam()
 local Window = interface:CreateWindow({
 	Title = "Sanc | ",
 	SubTitle = "Premium",
