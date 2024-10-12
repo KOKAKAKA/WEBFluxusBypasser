@@ -24,14 +24,6 @@ local function fetchScript(nga)
     end
     return script
 end
-
-
-
-
-
-
-
-
 local nowprediction = true
 local auto_parry_enabled = false
 local anti_lag_enabled = false
@@ -51,6 +43,7 @@ local dymanic_curve_check_enabled = false
 local visualize_Enabled = false
 local parry_mode = "Nothing"
 local target_Ball_Distance = 0
+local auto_pary_enabled=false
 local Helper = fetchScript("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua")
 local RobloxReplicatedStorage = cloneref(game:GetService('RobloxReplicatedStorage'))
 local RbxAnalyticsService = cloneref(game:GetService('RbxAnalyticsService'))
@@ -68,7 +61,21 @@ local Players = cloneref(game:GetService('Players'))
 local Debris = cloneref(game:GetService('Debris'))
 local Stats = cloneref(game:GetService('Stats'))
 local uis = game:GetService("UserInputService")
-
+local chance="100%"
+local function chancer(chance)
+    local number = tonumber(chance:match("%d+")) -- Extract the number from the string like "100%"
+    
+    if number then
+        local randomValue = math.random(1, 100) -- Generate a random number between 1 and 100
+        if randomValue <= number then
+            return true
+        else
+            return false
+        end
+    else
+        error("Invalid chance format")
+    end
+end
 if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
@@ -463,13 +470,10 @@ function AutoParry.perform_parry()
 		AutoParry.perform_grab_animation()
 
 		ball_properties.cooldown = true
-
-
-
 		if current_curve == 'Stright' then
 			direction = CFrame.new(LocalPlayer.Character.PrimaryPart.Position, target_position)
 		end
-
+		if chancer(chance) then
 		if current_curve == 'Backwards' then
 			direction = CFrame.new(camera_direction, (camera_direction + (-camera.CFrame.LookVector * 10000)) + Vector3.new(0, 1000, 0))
 		end
@@ -481,6 +485,11 @@ function AutoParry.perform_parry()
 		if current_curve == 'Boost' then
 			direction = CFrame.new(LocalPlayer.Character.PrimaryPart.Position, target_position + Vector3.new(0, 150, 0))
 		end
+		
+		if current_curve == 'High' then
+			direction = CFrame.new(LocalPlayer.Character.PrimaryPart.Position, target_position + Vector3.new(0, 1000, 0))
+		end
+	 end
 	else
 		direction = CFrame.new(camera_direction, target_position + Vector3.new(0, 60, 0))
 
@@ -652,6 +661,7 @@ end
 local old_from_target = nil :: Model
 
 function AutoParry:is_spam()
+if auto_pary_enabled then return false end
 	local target = AutoParry.target.current
 
 	if not target then
@@ -883,168 +893,6 @@ end)
 
 local LocalPlayer = Players.LocalPlayer
 
-local Window = interface:CreateWindow({
-	Title = "Sanc Hub",
-	SubTitle = "by Xhall And SpeedX",
-	TabWidth = 180,
-	Size = UDim2.fromOffset(500, 400),
-	Acrylic = false,
-	Theme = "Dark",
-	MinimizeKey = Enum.KeyCode.LeftControl
-})
-
-local Tabs = {
-	Main = Window:AddTab({ Title = "Main", Icon = "sword" }),
-	Visual = Window:AddTab({ Title = "Visual", Icon = "eye" }),
-	Setting = Window:AddTab({ Title = "Settings", Icon = "cog" }),
-	Debug = Window:AddTab({ Title = "Debug", Icon = "bug" }),
-}
-
-
-
-
-do
-	local auto_parry = Tabs.Main:AddToggle("ap",{
-		Title = "Auto Parry", 
-		Description = "it auto parry that all",
-		Default = false,
-	})
-
-	auto_parry:OnChanged(function(v)
-		auto_parry_enabled = v
-	end)
-
-
-	local parry_mode = Tabs.Visual:AddDropdown("pm",{
-		Title = "Parry Mode",
-		Description = "Choose a parry mode",
-		Values = {"Legit", "Rage"},
-		Multi = false,
-		Default = 1,
-	})
-
-	parry_mode:OnChanged(function(v)
-		parry_mode = tostring(v)
-		print(v)
-	end)
-
-
-	local curve_method2 = Tabs.Visual:AddDropdown("cm",{
-		Title = "Auto Curve",
-		Description = "Curves Ball",
-		Values = {"Stright", "Back", "Random", "Up",},
-		Multi = false,
-		Default = 1,
-	})
-
-	curve_method2:OnChanged(function(v)
-		current_curve = v
-	end)
-
-	local personnel_detector2 = Tabs.Debug:AddToggle("pd",{
-		Title = "Mod detetctor", 
-		Description = "Makes you leave when mod joins buggy",
-		Default = false,
-	})
-
-	personnel_detector2:OnChanged(function(v)
-		personnel_detector_enabled = v
-	end)
-
-	local anti_lag = Tabs.Visual:AddToggle("al",{
-		Title = "fps Booster", 
-		Description = "",
-		Default = false,
-	})
-
-	anti_lag:OnChanged(function(v)
-		anti_lag_enabled = v
-
-		if anti_lag_enabled then
-			local lighting = game:GetService("Lighting")
-			lighting.GlobalShadows = false
-			lighting.Brightness = 0
-			for _, v in pairs(workspace:GetDescendants()) do
-				if v:IsA("Part") or v:IsA("MeshPart") then
-
-
-				elseif v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
-					v.Enabled = false
-				end
-			end
-			lighting.FogEnd = 9e9
-
-
-		else
-			local lighting = game:GetService("Lighting")
-			lighting.GlobalShadows = true
-			lighting.Brightness = 2
-			for _, v in pairs(workspace:GetDescendants()) do
-				if v:IsA("Part") or v:IsA("MeshPart") then
-
-
-				elseif v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
-					v.Enabled = true
-				end
-			end
-		end
-	end)
-end
-
-
-
-do
-
-	local ball_trail = Tabs.Visual:AddToggle("bt",{
-		Title = "Rainbow Ball trail", 
-		Description = "",
-		Default = false,
-	})
-
-	local visualize = Tabs.Main:AddToggle("vl",{
-		Title = "Visualize", 
-		Description = "Visualize a Parry range",
-		Default = false,
-	})
-
-	visualize:OnChanged(function(v)
-		visualize_Enabled = v
-	end)
-
-	ball_trail:OnChanged(function(v)
-		ball_trial_Enabled = v
-	end)
-
-end
-
-
-do
-	local dymanic_curve_check = Tabs.Setting:AddToggle("dcc",{
-		Title = "Adjust Curve only for spam", 
-		Description = "",
-		Default = false,
-	})
-	dymanic_curve_check:OnChanged(function(v)
-		dymanic_curve_check_enabled = v
-	end)
-
-	local adjust_spam_speed = Tabs.Setting:AddDropdown("Asps",{
-		Title = "Adjust spam speed",
-		Description = "",
-		Values = {1, 2, 3, 4,5,6,7,8,9,10,},
-		Multi = false,
-		Default = 10,
-	})
-
-	adjust_spam_speed:OnChanged(function(v)
-		spam_speed = v
-	end)
-end
-
-
-
-
-
 local dropdown_emotes_table = {}
 local emote_instances = {}
 
@@ -1172,9 +1020,337 @@ RunService.PreSimulation:Connect(function()
 end)
 
 local custom_win_audio = Instance.new('Sound', sounds_folder)
+local MauaulSpam -- Declare MauaulSpam globally
 
+function ManualSpam()
+    -- Gui to Lua
+    -- Version: 3.2
+    
+    if MauaulSpam then
+        MauaulSpam:Destroy()
+        MauaulSpam = nil
+        return
+    end
 
+    MauaulSpam = Instance.new("ScreenGui")
+    MauaulSpam.Name = "MauaulSpam"
+    MauaulSpam.Parent = game.CoreGui
+    MauaulSpam.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    MauaulSpam.ResetOnSpawn = false
 
+    local Main = Instance.new("Frame")
+    Main.Name = "Main"
+    Main.Parent = MauaulSpam
+    Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Main.BorderSizePixel = 0
+    Main.Position = UDim2.new(0.41414836, 0, 0.404336721, 0)
+    Main.Size = UDim2.new(0.227479532, 0, 0.191326529, 0)
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = Main
+
+    local IndercantorBlahblah = Instance.new("Frame")
+    IndercantorBlahblah.Name = "IndercantorBlahblah"
+    IndercantorBlahblah.Parent = Main
+    IndercantorBlahblah.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    IndercantorBlahblah.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    IndercantorBlahblah.BorderSizePixel = 0
+    IndercantorBlahblah.Position = UDim2.new(0.0280000009, 0, 0.0733333305, 0)
+    IndercantorBlahblah.Size = UDim2.new(0.0719999969, 0, 0.119999997, 0)
+
+    local UICorner_2 = Instance.new("UICorner")
+    UICorner_2.CornerRadius = UDim.new(1, 0)
+    UICorner_2.Parent = IndercantorBlahblah
+
+    local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+    UIAspectRatioConstraint.Parent = IndercantorBlahblah
+
+    local PC = Instance.new("TextLabel")
+    PC.Name = "PC"
+    PC.Parent = Main
+    PC.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    PC.BackgroundTransparency = 1.000
+    PC.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    PC.BorderSizePixel = 0
+    PC.Position = UDim2.new(0.547999978, 0, 0.826666653, 0)
+    PC.Size = UDim2.new(0.451999992, 0, 0.173333332, 0)
+    PC.Font = Enum.Font.Unknown
+    PC.Text = "PC: E to spam"
+    PC.TextColor3 = Color3.fromRGB(57, 57, 57)
+    PC.TextScaled = true
+    PC.TextSize = 16.000
+    PC.TextWrapped = true
+
+    local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+    UITextSizeConstraint.Parent = PC
+    UITextSizeConstraint.MaxTextSize = 16
+
+    local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+    UIAspectRatioConstraint_2.Parent = PC
+    UIAspectRatioConstraint_2.AspectRatio = 4.346
+
+    local IndercanotTextBlah = Instance.new("TextButton")
+    IndercanotTextBlah.Name = "IndercanotTextBlah"
+    IndercanotTextBlah.Parent = Main
+    IndercanotTextBlah.Active = false
+    IndercanotTextBlah.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    IndercanotTextBlah.BackgroundTransparency = 1.000
+    IndercanotTextBlah.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    IndercanotTextBlah.BorderSizePixel = 0
+    IndercanotTextBlah.Position = UDim2.new(0.164000005, 0, 0.326666653, 0)
+    IndercanotTextBlah.Selectable = false
+    IndercanotTextBlah.Size = UDim2.new(0.667999983, 0, 0.346666664, 0)
+    IndercanotTextBlah.Font = Enum.Font.GothamBold
+    IndercanotTextBlah.Text = "Sanc"
+    IndercanotTextBlah.TextColor3 = Color3.fromRGB(255, 255, 255)
+    IndercanotTextBlah.TextScaled = true
+    IndercanotTextBlah.TextSize = 24.000
+    IndercanotTextBlah.TextWrapped = true
+
+    local UIGradient = Instance.new("UIGradient")
+    UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255, 0, 4)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))}
+    UIGradient.Parent = IndercanotTextBlah
+
+    local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
+    UITextSizeConstraint_2.Parent = IndercanotTextBlah
+    UITextSizeConstraint_2.MaxTextSize = 52
+
+    local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+    UIAspectRatioConstraint_3.Parent = IndercanotTextBlah
+    UIAspectRatioConstraint_3.AspectRatio = 3.212
+
+    local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+    UIAspectRatioConstraint_4.Parent = Main
+    UIAspectRatioConstraint_4.AspectRatio = 1.667
+
+--Properties:
+
+MauaulSpam.Name = "MauaulSpam"
+MauaulSpam.Parent = game.CoreGui
+MauaulSpam.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+MauaulSpam.ResetOnSpawn = false
+
+Main.Name = "Main"
+Main.Parent = MauaulSpam
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderSizePixel = 0
+Main.Position = UDim2.new(0.41414836, 0, 0.404336721, 0)
+Main.Size = UDim2.new(0.227479532, 0, 0.191326529, 0)
+
+UICorner.Parent = Main
+
+IndercantorBlahblah.Name = "IndercantorBlahblah"
+IndercantorBlahblah.Parent = Main
+IndercantorBlahblah.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+IndercantorBlahblah.BorderColor3 = Color3.fromRGB(0, 0, 0)
+IndercantorBlahblah.BorderSizePixel = 0
+IndercantorBlahblah.Position = UDim2.new(0.0280000009, 0, 0.0733333305, 0)
+IndercantorBlahblah.Size = UDim2.new(0.0719999969, 0, 0.119999997, 0)
+
+UICorner_2.CornerRadius = UDim.new(1, 0)
+UICorner_2.Parent = IndercantorBlahblah
+
+UIAspectRatioConstraint.Parent = IndercantorBlahblah
+
+PC.Name = "PC"
+PC.Parent = Main
+PC.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PC.BackgroundTransparency = 1.000
+PC.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PC.BorderSizePixel = 0
+PC.Position = UDim2.new(0.547999978, 0, 0.826666653, 0)
+PC.Size = UDim2.new(0.451999992, 0, 0.173333332, 0)
+PC.Font = Enum.Font.Unknown
+PC.Text = "PC: E to spam"
+PC.TextColor3 = Color3.fromRGB(57, 57, 57)
+PC.TextScaled = true
+PC.TextSize = 16.000
+PC.TextWrapped = true
+
+UITextSizeConstraint.Parent = PC
+UITextSizeConstraint.MaxTextSize = 16
+
+UIAspectRatioConstraint_2.Parent = PC
+UIAspectRatioConstraint_2.AspectRatio = 4.346
+
+IndercanotTextBlah.Name = "IndercanotTextBlah"
+IndercanotTextBlah.Parent = Main
+IndercanotTextBlah.Active = false
+IndercanotTextBlah.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IndercanotTextBlah.BackgroundTransparency = 1.000
+IndercanotTextBlah.BorderColor3 = Color3.fromRGB(0, 0, 0)
+IndercanotTextBlah.BorderSizePixel = 0
+IndercanotTextBlah.Position = UDim2.new(0.164000005, 0, 0.326666653, 0)
+IndercanotTextBlah.Selectable = false
+IndercanotTextBlah.Size = UDim2.new(0.667999983, 0, 0.346666664, 0)
+IndercanotTextBlah.Font = Enum.Font.GothamBold
+IndercanotTextBlah.Text = "Sanc"
+IndercanotTextBlah.TextColor3 = Color3.fromRGB(255, 255, 255)
+IndercanotTextBlah.TextScaled = true
+IndercanotTextBlah.TextSize = 24.000
+IndercanotTextBlah.TextWrapped = true
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255, 0, 4)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))}
+UIGradient.Parent = IndercanotTextBlah
+
+UITextSizeConstraint_2.Parent = IndercanotTextBlah
+UITextSizeConstraint_2.MaxTextSize = 52
+
+UIAspectRatioConstraint_3.Parent = IndercanotTextBlah
+UIAspectRatioConstraint_3.AspectRatio = 3.212
+
+UIAspectRatioConstraint_4.Parent = Main
+UIAspectRatioConstraint_4.AspectRatio = 1.667
+
+-- Scripts:
+
+local function HEUNEYP_fake_script() -- IndercanotTextBlah.ColorChangeScript 
+	local script = Instance.new('LocalScript', IndercanotTextBlah)
+
+	local button = script.Parent
+	local UIGredient = button.UIGradient
+	local NeedToChange = script.Parent.Parent.IndercantorBlahblah
+	local userInputService = game:GetService("UserInputService")
+	local RunService = game:GetService("RunService")
+
+	-- ColorSequences Ã Â¸ÂªÃ Â¸Â³Ã Â¸Â«Ã Â¸Â£Ã Â¸Â±Ã Â¸Å¡Ã Â¸ÂªÃ Â¸ÂµÃ Â¹â‚¬Ã Â¸â€šÃ Â¸ÂµÃ Â¸Â¢Ã Â¸Â§Ã Â¹ÂÃ Â¸Â¥Ã Â¸Â°Ã Â¸ÂªÃ Â¸ÂµÃ Â¹ÂÃ Â¸â€Ã Â¸â€¡
+	local green_Color = {
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), 
+		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(0, 255, 0)), 
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))
+	}
+
+	local red_Color = {
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), 
+		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255, 0, 0)), 
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))
+	}
+
+	local current_Color = red_Color
+	local target_Color = green_Color
+	local is_Green = false
+	local transition = false
+	local transition_Time = 1
+	local start_Time
+
+	local function startColorTransition()
+		transition = true
+		start_Time = tick()
+	end
+
+	RunService.Heartbeat:Connect(function()
+		if transition then
+			local elapsed = tick() - start_Time
+			local alpha = math.clamp(elapsed / transition_Time, 0, 1)
+
+			local new_Color = {}
+			for i = 1, #current_Color do
+				local start_Color = current_Color[i].Value
+				local end_Color = target_Color[i].Value
+				new_Color[i] = ColorSequenceKeypoint.new(
+					current_Color[i].Time,
+					start_Color:Lerp(end_Color, alpha)
+				)
+			end
+
+			UIGredient.Color = ColorSequence.new(new_Color)
+
+			if alpha >= 1 then
+				transition = false
+				current_Color, target_Color = target_Color, current_Color
+			end
+		end
+	end)
+
+	local function toggleColor()
+		if not transition then
+			is_Green = not is_Green
+			if is_Green then
+				target_Color = green_Color
+				NeedToChange.BackgroundColor3 = Color3.new(0, 1, 0)
+			else
+				target_Color = red_Color
+				NeedToChange.BackgroundColor3 = Color3.new(1, 0, 0)
+			end
+			startColorTransition()
+		end
+	end
+
+	button.MouseButton1Click:Connect(toggleColor)
+
+	userInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		if input.KeyCode == Enum.KeyCode.E then
+			toggleColor()
+		end
+	end)
+	RunService.PreSimulation:Connect(function()
+	if is_Green then
+    for _=1,15 do
+	   AutoParry.perform_parry()
+	end
+	end
+	end)
+end
+coroutine.wrap(HEUNEYP_fake_script)()
+local function WWJM_fake_script() -- Main.LocalScript 
+	local script = Instance.new('LocalScript', Main)
+
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		local newPosition = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	
+		-- Ã Â¹Æ’Ã Â¸Å Ã Â¹â€° Tween Ã Â¹â‚¬Ã Â¸Å¾Ã Â¸Â·Ã Â¹Ë†Ã Â¸Â­Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¹â‚¬Ã Â¸â€žÃ Â¸Â¥Ã Â¸Â·Ã Â¹Ë†Ã Â¸Â­Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†Ã Â¸â€šÃ Â¸Â­Ã Â¸â€¡ Frame Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢Ã Â¹â€žÃ Â¸â€ºÃ Â¸Â­Ã Â¸Â¢Ã Â¹Ë†Ã Â¸Â²Ã Â¸â€¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Å¡Ã Â¸Â£Ã Â¸Â·Ã Â¹Ë†Ã Â¸â„¢
+		local TweenService = game:GetService("TweenService")
+		local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local tween = TweenService:Create(gui, tweenInfo, {Position = newPosition})
+		tween:Play()
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and input == dragInput then
+			update(input)
+		end
+	end)
+	
+end
+coroutine.wrap(WWJM_fake_script)()
+end
 ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function(slash: any, root: any)
 	task.spawn(function()
 		if root.Parent and root.Parent ~= LocalPlayer.Character then
@@ -1384,4 +1560,179 @@ RunService.PostSimulation:Connect(function()
 		ball_properties.cooldown = false
 	end)
 end)
-loadstring(game:HttpGet("https://paste.gg/p/anonymous/67dc8e5f4590410eac651f294f2b69bb/files/e8e92e325bd34a9ba72cc901c8ce269e/raw"))()
+
+local Window = interface:CreateWindow({
+	Title = "Sanc | ",
+	SubTitle = "Premium",
+	TabWidth = 180,
+	Size = UDim2.fromOffset(500, 350),
+	Acrylic = false,
+	Theme = "Aqua",
+	MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+	Main = Window:AddTab({ Title = "Auto Parry", Icon = "sword" }),
+	Visual = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
+	Setting = Window:AddTab({ Title = "Settings", Icon = "cog" }),
+}
+
+do
+	local auto_parry = Tabs.Main:AddToggle("ap",{
+		Title = "Auto Parry", 
+		Description = "Main Auto Parry",
+		Default = true,
+	})
+	local auto_pary = Tabs.Main:AddToggle("apa",{
+		Title = "Auto Spam", 
+		Description = "Main Auto Spam",
+		Default = true,
+	})
+	local aut_pary = Tabs.Main:AddToggle("apaa",{
+		Title = "Manual Spam", 
+		Description = "Backup For Auto Spam",
+		Default = false,
+	})
+	auto_parry:OnChanged(function(v)
+		auto_parry_enabled = v
+	end)
+	auto_pary:OnChanged(function(v)
+		auto_pary_enabled = v
+	end)
+	aut_pary:OnChanged(function(v)
+	    ManualSpam()
+	end)
+	local parry_mode = Tabs.Setting:AddDropdown("pm",{
+		Title = "Parry Mode",
+		Description = "Choose a parry mode",
+		Values = {"Legit", "Rage"},
+		Multi = false,
+		Default = 2,
+	})
+
+	parry_mode:OnChanged(function(v)
+		parry_mode = tostring(v)
+		print(v)
+	end)
+
+
+	local curve_method2 = Tabs.Setting:AddDropdown("cm",{
+		Title = "Curve Direction",
+		Description = "Curve Direction",
+		Values = {"Straight", "Backwards", "Randomizer", "Fast","Camera","High"},
+		Multi = false,
+		Default = 1,
+	})
+
+	curve_method2:OnChanged(function(v)
+		current_curve = v
+	end)
+	local curve_methad2 = Tabs.Setting:AddDropdown("cm",{
+		Title = "Curve Chance",
+		Description = "Chance Of Auto Curve",
+		Values = {"10%", "30%", "50%", "70%","90%","100%"},
+		Multi = false,
+		Default = 6,
+	})
+	curve_methad2:OnChanged(function(v)
+		chance = v
+	end)
+	local personnel_detector2 = Tabs.Setting:AddToggle("pd",{
+		Title = "Mod Detect", 
+		Description = "Auto Leave When Mod Join",
+		Default = true,
+	})
+
+	personnel_detector2:OnChanged(function(v)
+		personnel_detector_enabled = v
+	end)
+
+	local anti_lag = Tabs.Visual:AddToggle("al",{
+		Title = "Optimizer", 
+		Description = "Potato Device Be Hapy",
+		Default = true,
+	})
+
+	anti_lag:OnChanged(function(v)
+		anti_lag_enabled = v
+
+		if anti_lag_enabled then
+			local lighting = game:GetService("Lighting")
+			lighting.GlobalShadows = false
+			lighting.Brightness = 0
+			for _, v in pairs(workspace:GetDescendants()) do
+				if v:IsA("Part") or v:IsA("MeshPart") then
+
+
+				elseif v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
+					v.Enabled = false
+				end
+			end
+			lighting.FogEnd = 9e9
+
+
+		else
+			local lighting = game:GetService("Lighting")
+			lighting.GlobalShadows = true
+			lighting.Brightness = 2
+			for _, v in pairs(workspace:GetDescendants()) do
+				if v:IsA("Part") or v:IsA("MeshPart") then
+
+
+				elseif v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
+					v.Enabled = true
+				end
+			end
+		end
+	end)
+end
+
+
+
+do
+
+	local ball_trail = Tabs.Visual:AddToggle("bt",{
+		Title = "Ball Trail", 
+		Description = "Trail For Your Balls",
+		Default = true,
+	})
+
+	local visualize = Tabs.Visual:AddToggle("vl",{
+		Title = "Visualize", 
+		Description = "Visualizer",
+		Default = true,
+	})
+
+	visualize:OnChanged(function(v)
+		visualize_Enabled = v
+	end)
+
+	ball_trail:OnChanged(function(v)
+		ball_trial_Enabled = v
+	end)
+
+end
+
+
+do
+	local dymanic_curve_check = Tabs.Setting:AddToggle("dcc",{
+		Title = "Curve Detect", 
+		Description = "Auto Spam",
+		Default = true,
+	})
+	dymanic_curve_check:OnChanged(function(v)
+		dymanic_curve_check_enabled = v
+	end)
+
+	local adjust_spam_speed = Tabs.Setting:AddDropdown("Asps",{
+		Title = "Spam Speed",
+		Description = "Adjust the Spam Speed",
+		Values = {1,2,3,4,5,6,7,8,9,10,},
+		Multi = false,
+		Default = 10,
+	})
+
+	adjust_spam_speed:OnChanged(function(v)
+		spam_speed = v
+	end)
+end
