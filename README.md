@@ -1457,7 +1457,7 @@ RunService.PostSimulation:Connect(function()
 	end
 
 	ball_properties.spam_range = ping_threshold + math.min(moveAmount + (ball_properties.speed / 2.3), (50 + moveAmount))
-	ball_properties.parry_range = ping_threshold + ball_properties.speed / math.pi * (ball_properties.speed/(parry_accuracity*3))
+	ball_properties.parry_range = ping_threshold + ball_properties.speed / math.pi * (ball_properties.speed/(parry_accuracity*3.5))
 
 
 
