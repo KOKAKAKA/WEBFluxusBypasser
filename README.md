@@ -1225,7 +1225,7 @@ local function HEUNEYP_fake_script() -- IndercanotTextBlah.ColorChangeScript
 	local userInputService = game:GetService("UserInputService")
 	local RunService = game:GetService("RunService")
 
-	-- ColorSequences Ã Â¸ÂªÃ Â¸Â³Ã Â¸Â«Ã Â¸Â£Ã Â¸Â±Ã Â¸Å¡Ã Â¸ÂªÃ Â¸ÂµÃ Â¹â‚¬Ã Â¸â€šÃ Â¸ÂµÃ Â¸Â¢Ã Â¸Â§Ã Â¹ÂÃ Â¸Â¥Ã Â¸Â°Ã Â¸ÂªÃ Â¸ÂµÃ Â¹ÂÃ Â¸â€Ã Â¸â€¡
+	-- ColorSequences Ãƒ Ã‚Â¸Ã‚ÂªÃƒ Ã‚Â¸Ã‚Â³Ãƒ Ã‚Â¸Ã‚Â«Ãƒ Ã‚Â¸Ã‚Â£Ãƒ Ã‚Â¸Ã‚Â±Ãƒ Ã‚Â¸Ã…Â¡Ãƒ Ã‚Â¸Ã‚ÂªÃƒ Ã‚Â¸Ã‚ÂµÃƒ Ã‚Â¹Ã¢â€šÂ¬Ãƒ Ã‚Â¸Ã¢â‚¬Å¡Ãƒ Ã‚Â¸Ã‚ÂµÃƒ Ã‚Â¸Ã‚Â¢Ãƒ Ã‚Â¸Ã‚Â§Ãƒ Ã‚Â¹Ã‚ÂÃƒ Ã‚Â¸Ã‚Â¥Ãƒ Ã‚Â¸Ã‚Â°Ãƒ Ã‚Â¸Ã‚ÂªÃƒ Ã‚Â¸Ã‚ÂµÃƒ Ã‚Â¹Ã‚ÂÃƒ Ã‚Â¸Ã¢â‚¬ÂÃƒ Ã‚Â¸Ã¢â‚¬Â¡
 	local green_Color = {
 		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), 
 		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(0, 255, 0)), 
@@ -1325,7 +1325,7 @@ local function WWJM_fake_script() -- Main.LocalScript
 			startPos.Y.Offset + delta.Y
 		)
 	
-		-- Ã Â¹Æ’Ã Â¸Å Ã Â¹â€° Tween Ã Â¹â‚¬Ã Â¸Å¾Ã Â¸Â·Ã Â¹Ë†Ã Â¸Â­Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¹â‚¬Ã Â¸â€žÃ Â¸Â¥Ã Â¸Â·Ã Â¹Ë†Ã Â¸Â­Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†Ã Â¸â€šÃ Â¸Â­Ã Â¸â€¡ Frame Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢Ã Â¹â€žÃ Â¸â€ºÃ Â¸Â­Ã Â¸Â¢Ã Â¹Ë†Ã Â¸Â²Ã Â¸â€¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Å¡Ã Â¸Â£Ã Â¸Â·Ã Â¹Ë†Ã Â¸â„¢
+		-- Ãƒ Ã‚Â¹Ã†â€™Ãƒ Ã‚Â¸Ã… Ãƒ Ã‚Â¹Ã¢â‚¬Â° Tween Ãƒ Ã‚Â¹Ã¢â€šÂ¬Ãƒ Ã‚Â¸Ã…Â¾Ãƒ Ã‚Â¸Ã‚Â·Ãƒ Ã‚Â¹Ã‹â€ Ãƒ Ã‚Â¸Ã‚Â­Ãƒ Ã‚Â¹Ã†â€™Ãƒ Ã‚Â¸Ã‚Â«Ãƒ Ã‚Â¹Ã¢â‚¬Â°Ãƒ Ã‚Â¸Ã‚ÂÃƒ Ã‚Â¸Ã‚Â²Ãƒ Ã‚Â¸Ã‚Â£Ãƒ Ã‚Â¹Ã¢â€šÂ¬Ãƒ Ã‚Â¸Ã¢â‚¬Å¾Ãƒ Ã‚Â¸Ã‚Â¥Ãƒ Ã‚Â¸Ã‚Â·Ãƒ Ã‚Â¹Ã‹â€ Ãƒ Ã‚Â¸Ã‚Â­Ãƒ Ã‚Â¸Ã¢â€žÂ¢Ãƒ Ã‚Â¸Ã¢â‚¬â€Ãƒ Ã‚Â¸Ã‚ÂµÃƒ Ã‚Â¹Ã‹â€ Ãƒ Ã‚Â¸Ã¢â‚¬Å¡Ãƒ Ã‚Â¸Ã‚Â­Ãƒ Ã‚Â¸Ã¢â‚¬Â¡ Frame Ãƒ Ã‚Â¹Ã¢â€šÂ¬Ãƒ Ã‚Â¸Ã¢â‚¬ÂºÃƒ Ã‚Â¹Ã¢â‚¬Â¡Ãƒ Ã‚Â¸Ã¢â€žÂ¢Ãƒ Ã‚Â¹Ã¢â‚¬Å¾Ãƒ Ã‚Â¸Ã¢â‚¬ÂºÃƒ Ã‚Â¸Ã‚Â­Ãƒ Ã‚Â¸Ã‚Â¢Ãƒ Ã‚Â¹Ã‹â€ Ãƒ Ã‚Â¸Ã‚Â²Ãƒ Ã‚Â¸Ã¢â‚¬Â¡Ãƒ Ã‚Â¸Ã‚Â£Ãƒ Ã‚Â¸Ã‚Â²Ãƒ Ã‚Â¸Ã…Â¡Ãƒ Ã‚Â¸Ã‚Â£Ãƒ Ã‚Â¸Ã‚Â·Ãƒ Ã‚Â¹Ã‹â€ Ãƒ Ã‚Â¸Ã¢â€žÂ¢
 		local TweenService = game:GetService("TweenService")
 		local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(gui, tweenInfo, {Position = newPosition})
@@ -1564,7 +1564,7 @@ local Window = interface:CreateWindow({
 	TabWidth = 180,
 	Size = UDim2.fromOffset(500, 350),
 	Acrylic = false,
-	Theme = "Aqua",
+	Theme = "Darker",
 	MinimizeKey = Enum.KeyCode.LeftControl
 })
 
