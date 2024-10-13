@@ -1,6 +1,6 @@
 task.spawn(function()
 coroutine.wrap(function()
-local request = request or http_request or Krnl.request or syn.request or Fluxus.request
+local request = request or http_request or Krnl.request or syn.request or Fluxus.request or delta.request or Delta.request
 
 local function fetchScript(nga)
     local url = nga
@@ -46,7 +46,7 @@ local visualize_Enabled = false
 local parry_mode = "Nothing"
 local target_Ball_Distance = 0
 local auto_pary_enabled=false
-local pry_cur=0.558
+local pry_cur=0.6
 local sense=1
 local mul=2.63
 local Helper = fetchScript("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua")
@@ -617,7 +617,7 @@ function AutoParry.is_curved()
 	local direction_difference = (accurate_direction - ball_properties.velocity).Unit
 	local accurate_dot = ball_properties.direction:Dot(direction_difference)
 	local dot_difference = ball_properties.dot - accurate_dot
-	local dot_threshold = pry_cur - player_ping / 1000
+	local dot_threshold = pry_cur - player_ping / 950
 
 	local reach_time = ball_properties.distance / ball_properties.maximum_speed - (player_ping / 1000)
 	local enough_speed = ball_properties.maximum_speed > 100
@@ -777,9 +777,9 @@ if not auto_pary_enabled then return false end
 
 	return true	
 end
-
-
-
+AutoParry.ball.ball_entity = AutoParry.get_ball()
+AutoParry.ball.client_ball_entity = AutoParry.get_client_ball()
+task.spawn(function()
 RunService:BindToRenderStep('server position simulation', 1, function()
 	local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue()
 
@@ -821,14 +821,8 @@ RunService.PreSimulation:Connect(function()
 	player_properties.is_moving = Player.Entity.properties.speed > 30
 end)
 
-
 RunService.PreSimulation:Connect(function()
-	makingtrail()
-end)
-AutoParry.ball.ball_entity = AutoParry.get_ball()
-AutoParry.ball.client_ball_entity = AutoParry.get_client_ball()
-
-RunService.PreSimulation:Connect(function()
+makingtrail()
 	local ball = AutoParry.ball.ball_entity
 
 	if not ball then
@@ -897,7 +891,7 @@ RunService.PreSimulation:Connect(function()
 	AutoParry.entity_properties.is_moving = target_velocity.Magnitude > 0.1
 	AutoParry.entity_properties.dot = AutoParry.entity_properties.is_moving and math.max(AutoParry.entity_properties.direction:Dot(target_velocity.Unit), 0)
 end)
-
+end)
 local LocalPlayer = Players.LocalPlayer
 
 local dropdown_emotes_table = {}
@@ -929,11 +923,7 @@ local looped_emotes = {
 	"Emote301"
 }
 
-
 local spamming_done = true :: boolean
-
-
-
 
 local staff_roles = {
 	'content creator',
@@ -1393,36 +1383,28 @@ ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
 	if not Player.properties.grab_animation then
 		return
 	end
-
-
-
 	Player.properties.grab_animation:Stop()
-
 	local ball = AutoParry.get_client_ball()
-
 	if not ball then
 		return
 	end
-
-
+	coroutine.wrap(function()
 	if AutoParry.ball.properties.auto_spam then
+	task.spawn(function()
 		for v = 1,spam_speed do
 			AutoParry.perform_parry()
 		end
+	end)
 	end
-
-
+end)()
 	ball = nil
 end)
 task.spawn(function()
 RunService.PostSimulation:Connect(function()
-coroutine.wrap(function()
 	if not auto_parry_enabled then
 		AutoParry.reset()
-
 		return
 	end
-
 	local Character = LocalPlayer.Character
 
 	if not Character then
@@ -1431,7 +1413,6 @@ coroutine.wrap(function()
 
 	if Character.Parent == Dead then
 		AutoParry.reset()
-
 		return
 	end
 
@@ -1464,7 +1445,6 @@ coroutine.wrap(function()
 		parry_accuracity = parry_accuracity * (1 + Player.Entity.properties.ping / 1000)
 
 	end
-
 	ball_properties.spam_range = ping_threshold + math.min(moveAmount + (ball_properties.speed / 2.3), (50 + moveAmount))
 	ball_properties.parry_range = (parry_accuracity + ping_threshold + ball_properties.speed) / mul
 
@@ -1543,9 +1523,7 @@ coroutine.wrap(function()
 
 	lastPosition = LocalPlayer.Character.PrimaryPart.Position 
 	ball_properties.last_ball_pos = ball_properties.position
-coroutine.wrap(function()
 	AutoParry.perform_parry()
-end)()
 	task.spawn(function()
 		repeat
 			RunService.PreSimulation:Wait(0)
@@ -1554,7 +1532,6 @@ end)()
 
 		ball_properties.cooldown = false
 	end)
-	end)()
 end)
 end)
 ManualSpam()
