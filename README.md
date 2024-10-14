@@ -1,3 +1,4 @@
+function niga()
 task.spawn(function()
 coroutine.wrap(function()
 local request = request or http_request or Krnl.request or syn.request or Fluxus.request or delta.request or Delta.request
@@ -1736,3 +1737,32 @@ do
 end 
 end)()
 end)
+end
+
+local KeyGuardLibrary = loadstring(game:HttpGet("https://cdn.keyguardian.org/library/v1.0.0.lua"))()
+local trueData = "79820250627447b88bf8b6b2598f9096"
+local falseData = "872d33334d694bf193db61e9a2c7ecec"
+
+KeyGuardLibrary.Set({
+  publicToken = "256a9d1deb5245f3a4e0750be863863a",
+  privateToken = "da4a82dd612a4019b5c37e6d224a4e05",
+  trueData = trueData,
+  falseData = falseData,
+})
+
+local key = _G.PremKey
+
+local response = KeyGuardLibrary.validatePremiumKey(key)
+
+if response == trueData then
+  niga()
+else
+  print("Key is invalid")
+end
+
+--[[
+  KeyGuardLibrary.validateDefaultKey(key) - Validate key
+  KeyGuardLibrary.validatePremiumKey(key) - Validate premium key
+  KeyGuardLibrary.getService() - Get service
+  KeyGuardLibrary.getLink() - Get link
+]]
