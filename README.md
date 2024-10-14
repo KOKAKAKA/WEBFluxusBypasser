@@ -49,7 +49,31 @@ local auto_pary_enabled=false
 local pry_cur=0.6
 local sense=1
 local mul=2.63
-local Helper = fetchScript("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua")
+function getgelp()
+local nurysium_module = {}
+
+local Players = game:GetService("Players")
+
+local Services = {
+    game:GetService('AdService'),
+    game:GetService('SocialService')
+}
+
+function nurysium_module.isAlive(Entity)
+    return Entity.Character and workspace.Alive:FindFirstChild(Entity.Name) and workspace.Alive:FindFirstChild(Entity.Name).Humanoid.Health > 0
+end
+
+function nurysium_module.getBall()
+    for index, ball in workspace:WaitForChild("Balls"):GetChildren() do
+        if ball:IsA("BasePart") and ball:GetAttribute("realBall") then
+            return ball
+        end
+    end
+end
+
+return nurysium_module;
+end
+local Helper = getgelp()
 local RobloxReplicatedStorage = cloneref(game:GetService('RobloxReplicatedStorage'))
 local RbxAnalyticsService = cloneref(game:GetService('RbxAnalyticsService'))
 local ReplicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
@@ -103,7 +127,7 @@ local names_map = {
 	['Soi'] = crypter.sha3_384(client_id .. 'Soi', 'sha3-256')
 }
 
-local interface = fetchScript('https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua')
+local interface = loadstring(game:HttpGet('https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua'))()
 
 local assets = game:GetObjects('rbxassetid://98657300657778')[1]
 
@@ -1288,7 +1312,7 @@ local function HEUNEYP_fake_script() -- IndercanotTextBlah.ColorChangeScript
 	end)
 	RunService.PreSimulation:Connect(function()
 	if is_Green then
-    for _=1,15 do
+    for _=1,spam_speed do
 	   AutoParry.perform_parry()
 	end
 	end
